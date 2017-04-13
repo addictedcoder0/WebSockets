@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket-Client</title>
+</head>
+<body>
+    <form>
+        <input id="textMessage" type="text">
+        <input onclick="sendMessage();" value="send Message" type="button">
+    </form>
+    <br><textarea id="messageTextArea" rows="10" cols="50"></textarea>
+    <script>
+        var webSocket = new WebSocket("ws://localhost:8080/WebSocket/ws");
+        var messageTextArea = document.getElementById("messageTextArea");
+        webSocket.onopen =  function(message){processOpen(message);};
+        function processOpen(message){
+            messageTextArea.value += "Server connect ...."+"\n";
+        }
+
+        webSocket.onclose = function(message){processClose(message);};
+        function processClose(message){
+            webSocket.send("client Disconnected");
+            messageTextArea.value += "Server Disconnect ...."+"\n";
+        }
+
+        webSocket.onerror = function(message){processError(message);};
+        function processError(message){
+            webSocket.send("client is facing error");
+            messageTextArea.value += "Error occurred"+"\n";
+        }
+
+        webSocket.onmessage = function(message){processMessage(message);};
+        function processMessage(message){
+            messageTextArea.value += "Recieve from Server ===> "+message.data +"\n";
+        }
+
+        function sendMessage(){
+            if(textMessage.value!="close"){
+                webSocket.send(textMessage.value);
+                messageTextArea.value += "sending to server ==> "+textMessage.value + " \n";
+                textMessage.value = "";
+            }else{
+                webSocket.close();
+            }
+        }
+
+    </script>
+</body>
+</html>
+
+
+
+
